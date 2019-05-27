@@ -11,7 +11,7 @@ env:
 # comands to install dependencies:
 install:
   - pip install -r requirements.txt
-
+  - pip install coveralls
 
 # To run Tests:
 before_script:
@@ -22,3 +22,7 @@ before_script:
 script:
   - coverage run --source='authors' manage.py test
   - coverage report -m
+  - coveralls
+
+after_script:
+  - coveralls
