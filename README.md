@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/andela/ah-backend-realers.svg?branch=ch-intergrate_Travis-166187847)](https://travis-ci.org/andela/ah-backend-realers)
+
+
 Authors Haven - A Social platform for the creative at heart.
 =======
 
