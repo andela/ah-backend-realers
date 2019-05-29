@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/andela/ah-backend-realers.svg?branch=ch-intergrate_Travis-166187847)](https://travis-ci.org/andela/ah-backend-realers)
-
+[![Build Status](https://travis-ci.org/andela/ah-backend-realers.svg?branch=ch-intergrate_Travis-166187847)](https://travis-ci.org/andela/ah-backend-realers) [![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-realers/badge.svg?branch=develop)](https://coveralls.io/github/andela/ah-backend-realers?branch=develop)
 
 Authors Haven - A Social platform for the creative at heart.
 =======
