@@ -9,6 +9,12 @@ by leveraging the modern web.
 
 ---
 
+## API documemation links
+
+[Swagger Documentation](https://ah-backend-realers.herokuapp.com/swagger)
+
+[Core-api Documentation](https://ah-backend-realers.herokuapp.com/docs)
+
 ## API Spec
 The preferred JSON object to be returned by the API should be structured as follows:
 
