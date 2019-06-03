@@ -20,36 +20,38 @@ class UserManager(BaseUserManager):
     to create `User` objects.
     """
 
-    def create_user(self, username, email, password=None):
+    def create_user(self, username, email, password,
+                    bio=None, image=None):
         """Create and return a `User` with an email, username and password."""
         if username is None:
-            raise TypeError('Users must have a username.')
+            raise TypeError(' Please provide a username')
 
         if email is None:
-            raise TypeError('Users must have an email address.')
+            raise TypeError('Please provide an email address')
 
-        user = self.model(username=username, email=self.normalize_email(email))
+        user = self.model(username=username, email=self.normalize_email(
+            email), bio=None, image=None)
         user.set_password(password)
         user.save()
 
         return user
 
     def create_superuser(self, username, email, password):
-      """
-      Create and return a `User` with superuser powers.
+        """
+        Create and return a `User` with superuser powers.
 
-      Superuser powers means that this use is an admin that can do anything
-      they want.
-      """
-      if password is None:
-          raise TypeError('Superusers must have a password.')
+        Superuser powers means that this use is an admin that can do anything
+        they want.
+        """
+        if password is None:
+            raise TypeError('Please provide a password for your super account')
 
-      user = self.create_user(username, email, password)
-      user.is_superuser = True
-      user.is_staff = True
-      user.save()
+        user = self.create_user(username, email, password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
 
-      return user
+        return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -70,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # will simply offer users a way to deactivate their account instead of
     # letting them delete it. That way they won't show up on the site anymore,
     # but we can still analyze the data.
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
 
     # The `is_staff` flag is expected by Django to determine who can and cannot
     # log into the Django admin site. For most users, this flag will always be
@@ -106,12 +108,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def get_full_name(self):
-      """
-      This method is required by Django for things like handling emails.
-      Typically, this would be the user's first and last name. Since we do
-      not store the user's real name, we return their username instead.
-      """
-      return self.username
+        """
+        This method is required by Django for things like handling emails.
+        Typically, this would be the user's first and last name. Since we do
+        not store the user's real name, we return their username instead.
+        """
+        return self.username
 
     def get_short_name(self):
         """
