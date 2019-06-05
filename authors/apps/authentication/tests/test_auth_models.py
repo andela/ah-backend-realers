@@ -35,18 +35,20 @@ class  ModelUserManagerTestCase(TestBase):
 
     def test_create_normal_user_with_no_username(self):
        
-        with self.assertRaises(TypeError) as realers_user_name_error:
-            user = User.objects.create_user(
+        with self.assertRaises(TypeError):
+            User.objects.create_user(
                 email=self.email, 
-                password=self.password
+                password=self.password,
+                username=None
             )
 
     def test_create_normal_user_with_no_email_address(self):
        
-        with self.assertRaises(TypeError) as realers_email_error:
-            user = User.objects.create_user(
+        with self.assertRaises(TypeError):
+            User.objects.create_user(
                 username=self.username, 
-                password=self.password
+                password=self.password,
+                email=None
             )
 
     def test_create_app_super_user(self):
@@ -69,3 +71,12 @@ class  ModelUserManagerTestCase(TestBase):
 
         # test against the two users in db checks
         self.assertNotEqual(number_of_db_objects, new_number_users)
+
+    def test_create_super_user_with_password_none(self):
+       
+        with self.assertRaises(TypeError):
+            User.objects.create_superuser(
+                email=self.email, 
+                password=None,
+                username=self.username
+            )

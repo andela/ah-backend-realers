@@ -11,6 +11,11 @@ from .serializers import (
 
 from drf_yasg.utils import swagger_auto_schema
 
+from .backends import (
+    AccountVerification
+)
+
+
 class RegistrationAPIView(APIView):
     # Allow any user (authenticated or not) to hit this endpoint.
     permission_classes = (AllowAny,)
@@ -18,12 +23,11 @@ class RegistrationAPIView(APIView):
     serializer_class = RegistrationSerializer
 
     @swagger_auto_schema(
-       operation_description='Regester a new User.',
-       operation_id='Sign up as a new user',
-       request_body=serializer_class,
-       responses={201: serializer_class(many=False), 400: 'BAD REQUEST'},
-   )
-
+        operation_description='Regester a new User.',
+        operation_id='Sign up as a new user',
+        request_body=serializer_class,
+        responses={201: serializer_class(many=False), 400: 'BAD REQUEST'},
+    )
     def post(self, request):
         user = request.data.get('user', {})
 
@@ -33,7 +37,7 @@ class RegistrationAPIView(APIView):
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
+        AccountVerification().send_verification_email(user.get('email'), request)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -43,12 +47,11 @@ class LoginAPIView(APIView):
     serializer_class = LoginSerializer
 
     @swagger_auto_schema(
-       operation_description='Login User.',
-       operation_id='login as a user',
-       request_body=serializer_class,
-       responses={201: serializer_class(many=False), 400: 'BAD REQUEST'},
-   )
-
+        operation_description='Login User.',
+        operation_id='login as a user',
+        request_body=serializer_class,
+        responses={201: serializer_class(many=False), 400: 'BAD REQUEST'},
+    )
     def post(self, request):
         user = request.data.get('user', {})
 
@@ -63,7 +66,7 @@ class LoginAPIView(APIView):
 
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
-    
+
     """
     retrieve: Get User Details
     Update: Update User Details
@@ -74,11 +77,10 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     serializer_class = UserSerializer
 
     @swagger_auto_schema(
-       operation_id='Retrieve User Details',
-       request_body=serializer_class,
-       responses={201: serializer_class(many=False), 400: 'BAD REQUEST'},
-   )
-
+        operation_id='Retrieve User Details',
+        request_body=serializer_class,
+        responses={201: serializer_class(many=False), 400: 'BAD REQUEST'},
+    )
     def retrieve(self, request, *args, **kwargs):
         # There is nothing to validate or save here. Instead, we just want the
         # serializer to handle turning our `User` object into something that
@@ -88,11 +90,10 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-       operation_id='Update User Details',
-       request_body=serializer_class,
-       responses={201: serializer_class(many=False), 400: 'BAD REQUEST'},
-   )
-
+        operation_id='Update User Details',
+        request_body=serializer_class,
+        responses={201: serializer_class(many=False), 400: 'BAD REQUEST'},
+    )
     def update(self, request, *args, **kwargs):
         serializer_data = request.data.get('user', {})
 
@@ -105,3 +106,12 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AccountActivation(APIView):
+
+    def get(self, request, **kwargs):
+        activation_key = kwargs.get('token') 
+        user = AccountVerification().verify_token(activation_key)
+        response = AccountVerification.verify_user(user)
+        return Response(response)
