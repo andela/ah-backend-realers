@@ -1,8 +1,10 @@
 from .test_base import TestBase
 import json
 from rest_framework import status
+from ..models import User
 
-class UserRegistrationAPIViewTestCase(TestBase):   
+
+class UserRegistrationAPIViewTestCase(TestBase):
 
     def test_user_registration(self):
         """
@@ -14,6 +16,35 @@ class UserRegistrationAPIViewTestCase(TestBase):
         self.assertEqual("testuser", result['user']['username'])
         self.assertIn(output, str(result))
 
+    def test_user_with_invalid_email(self):
+        self.user_data = {
+            "user": {
+                "email": "",
+                "username": "jenny",
+                "password": "123jemnny",
+                "bio": "l am a writer",
+                "image": "linking"
+            }
+        }
+        self.new_test_user = self.client.post(
+            self.register_url, self.user_data, format="json")
+        self.assertEqual(400, self.new_test_user.status_code)
+        self.assertRaises(TypeError)
+
+    def test_user_with_invalid_password(self):
+        self.user_data = {
+            "user": {
+                "email": "jenny@gmail",
+                "username": "jenny",
+                "password": "123",
+                "bio": "l am a writer",
+                "image": "the link"
+            }
+        }
+        self.the_new_user = self.client.post(
+            self.register_url, self.user_data, format="json")
+        self.assertEqual(400, self.the_new_user.status_code)
+        self.assertRaises(TypeError)
 
 class UserLoginAPIViewTestCase(TestBase):
     """ 
@@ -21,9 +52,10 @@ class UserLoginAPIViewTestCase(TestBase):
     """
 
     def test_login_for_signed_up_user(self):
-        
-        self.assertEquals("test@testuser.com", self.logged_in_user.data["email"])
-        self.assertEqual(self.logged_in_user.status_code , status.HTTP_200_OK)
+
+        self.assertEquals("test@testuser.com",
+                          self.logged_in_user.data["email"])
+        self.assertEqual(self.logged_in_user.status_code, status.HTTP_200_OK)
         self.assertIn('token', self.logged_in_user.data)
 
     def test_login_with_no_email(self):
@@ -34,7 +66,7 @@ class UserLoginAPIViewTestCase(TestBase):
                 "password": "donthack"
             }},
             format="json")
-        
+
         self.assertIn(
             'This field is required.',
             response.data["errors"]["email"]
@@ -50,12 +82,12 @@ class UserLoginAPIViewTestCase(TestBase):
                 "password": "donthack"
             }},
             format="json")
-        
+
         self.assertIn(
             'A user with this email and password was not found.',
             response.data["errors"]["error"]
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)  
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class UserRetrieveUpdateAPIViewTestCase(TestBase):
@@ -80,5 +112,5 @@ class UserRetrieveUpdateAPIViewTestCase(TestBase):
 
     def test_fetch_user_from_system_with_no_token(self):
         response = self.client.get('/api/user/')
-        self.assertIn("Authentication credentials were not provided.", str(response.data))
-
+        self.assertIn(
+            "Authentication credentials were not provided.", str(response.data))

@@ -7,9 +7,7 @@ from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
 from django.db import models
-from authors.apps.authentication.auth_token import AuthenticationToken
 
-auth = AuthenticationToken()
 class UserManager(BaseUserManager):
     """
     Django requires that custom users define their own Manager class. By
@@ -21,37 +19,37 @@ class UserManager(BaseUserManager):
     """
 
     def create_user(self, username, email, password,
-                    bio=None, image=None):
+                    bio, image):
         """Create and return a `User` with an email, username and password."""
         if username is None:
-            raise TypeError(' Please provide a username')
+            raise TypeError('Users must have a username.')
 
         if email is None:
             raise TypeError('Please provide an email address')
-
+            
         user = self.model(username=username, email=self.normalize_email(
-            email), bio=None, image=None)
+            email), bio=bio, image=image)
         user.set_password(password)
         user.save()
 
         return user
 
-    def create_superuser(self, username, email, password):
+    def create_superuser(self, username, email, password, bio, image):
         """
         Create and return a `User` with superuser powers.
 
-        Superuser powers means that this use is an admin that can do anything
-        they want.
-        """
+      Superuser powers means that this use is an admin that can do anything
+      they want.
+      """
         if password is None:
-            raise TypeError('Please provide a password for your super account')
+            raise TypeError('Superusers must have a password.')
 
-        user = self.create_user(username, email, password)
+        user = self.create_user(username, email, password, bio, image)
         user.is_superuser = True
         user.is_staff = True
         user.save()
 
-        return user
+      return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -65,6 +63,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     # the user anyways, we will also use the email for logging in because it is
     # the most common form of login credential at the time of writing.
     email = models.EmailField(db_index=True, unique=True)
+    bio = models.CharField(max_length=255, default=" ", null=True)
+    image = models.CharField(max_length=255, default=" ", null=True)
 
     # When a user no longer wishes to use our platform, they may try to delete
     # there account. That's a problem for us because the data we collect is
@@ -72,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # will simply offer users a way to deactivate their account instead of
     # letting them delete it. That way they won't show up on the site anymore,
     # but we can still analyze the data.
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     # The `is_staff` flag is expected by Django to determine who can and cannot
     # log into the Django admin site. For most users, this flag will always be
@@ -84,8 +84,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # A timestamp reprensenting when this object was last updated.
     updated_at = models.DateTimeField(auto_now=True)
-
-    message = "Please check your email and verify your registration"
 
     # More fields required by Django when specifying a custom user model.
 
@@ -108,12 +106,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     @property
     def get_full_name(self):
-        """
-        This method is required by Django for things like handling emails.
-        Typically, this would be the user's first and last name. Since we do
-        not store the user's real name, we return their username instead.
-        """
-        return self.username
+      """
+      This method is required by Django for things like handling emails.
+      Typically, this would be the user's first and last name. Since we do
+      not store the user's real name, we return their username instead.
+      """
+      return self.username
 
     def get_short_name(self):
         """
@@ -122,10 +120,5 @@ class User(AbstractBaseUser, PermissionsMixin):
         the user's real name, we return their username instead.
         """
         return self.username
-
-
-    @property
-    def token(self):
-        return auth.encode_auth_token(self.pk)
 
 

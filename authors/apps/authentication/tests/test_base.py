@@ -14,7 +14,9 @@ class TestBase(APITestCase):
                 'user': {
                     'email': "test@testuser.com",
                     'username': "testuser",
-                    'password': "password"
+                    'password': "password",
+                    'bio': "I am test user",
+                    'image': "image-link"
                     }
                 }
        

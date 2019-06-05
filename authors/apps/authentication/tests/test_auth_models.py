@@ -56,7 +56,9 @@ class  ModelUserManagerTestCase(TestBase):
         user = User.objects.create_superuser(
             email=self.email, 
             password=self.password,
-            username=self.username)
+            username=self.username,
+            bio="",
+            image="")
 
         # check whether created user is a superuser
         self.assertTrue(user.is_superuser)
