@@ -8,10 +8,11 @@ class UserRegistrationAPIViewTestCase(TestBase):
         """
         Test to verify that a post call with user valid data
         """
-
+        output = "Please check your email and verify your registration"
         result = json.loads(self.new_test_user.content)
         self.assertEquals(201, self.new_test_user.status_code)
         self.assertEqual("testuser", result['user']['username'])
+        self.assertIn(output, str(result))
 
 
 class UserLoginAPIViewTestCase(TestBase):
@@ -23,6 +24,7 @@ class UserLoginAPIViewTestCase(TestBase):
         
         self.assertEquals("test@testuser.com", self.logged_in_user.data["email"])
         self.assertEqual(self.logged_in_user.status_code , status.HTTP_200_OK)
+        self.assertIn('token', self.logged_in_user.data)
 
     def test_login_with_no_email(self):
 
@@ -62,14 +64,21 @@ class UserRetrieveUpdateAPIViewTestCase(TestBase):
     file 
     """
 
-    def test_fetch_user_from_system(self):
-
-        self.client.login(
-            email=self.user_data['user']['email'], password=self.user_data['user']['password'])
+    def test_fetch_user_from_system_with_valid_token(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(self.token))
         response = self.client.get(
             # unlike other routes this has no key name
             # touse to refer to it in the urls file
             '/api/user/')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_fetch_user_from_system_with_Invalid_token(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer jhgsjfudstuydsfj')
+        response = self.client.get('/api/user/')
+        self.assertIn("Invalid token", str(response.data))
+
+    def test_fetch_user_from_system_with_no_token(self):
+        response = self.client.get('/api/user/')
+        self.assertIn("Authentication credentials were not provided.", str(response.data))
 

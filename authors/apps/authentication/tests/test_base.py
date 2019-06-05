@@ -35,3 +35,6 @@ class TestBase(APITestCase):
             email=self.email, 
             password=self.password,
             username=self.username)
+
+        #Getting the token
+        self.token = self.logged_in_user.data.get("token")
