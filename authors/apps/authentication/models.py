@@ -7,7 +7,9 @@ from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
 from django.db import models
+from authors.apps.authentication.auth_token import AuthenticationToken
 
+auth = AuthenticationToken()
 class UserManager(BaseUserManager):
     """
     Django requires that custom users define their own Manager class. By
@@ -81,6 +83,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     # A timestamp reprensenting when this object was last updated.
     updated_at = models.DateTimeField(auto_now=True)
 
+    message = "Please check your email and verify your registration"
+
     # More fields required by Django when specifying a custom user model.
 
     # The `USERNAME_FIELD` property tells us which field we will use to log in.
@@ -116,5 +120,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         the user's real name, we return their username instead.
         """
         return self.username
+
+
+    @property
+    def token(self):
+        return auth.encode_auth_token(self.pk)
 
 
