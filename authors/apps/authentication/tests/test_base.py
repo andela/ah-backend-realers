@@ -1,7 +1,9 @@
 from rest_framework.test import APITestCase, APIClient
 from django.urls import reverse
 from ..models import User
+import json, os
 from ..backends import AccountVerification
+from itsdangerous import URLSafeTimedSerializer
 
 
 class TestBase(APITestCase):
@@ -120,3 +122,41 @@ class TestBase(APITestCase):
         }
         self.new_users = self.client.post(
             self.register_url, self.recevied_data, format="json")
+        #Test user with real email for password reset testing
+        self.user_data_real_email = {
+            'user': {
+                'email': "habibsentongo@gmail.com",
+                'username': "goodtestuser",
+                'password': "password"
+            }
+        }
+
+        #Good password reset token for goodtestuser
+        serializer = URLSafeTimedSerializer(os.environ.get("SECRET_KEY"))
+        self.reset_token = serializer.dumps(self.user_data_real_email['user']['email'], salt=os.environ.get("SECURITY_PASSWORD_SALT"))
+
+        #Bad password reset token for goodtestuser
+        self.bad_reset_token = "ImhhYmlic2VudG9uZ29AZ21haWwuY29tIg.XPv5YA.0GBZezdqsqsfdwdzEep4rrkQhdw"
+
+        #Good reset data
+        self.reset_data = {
+            'password': "qwertyuiop",
+            'confirm_password': "qwertyuiop"
+        }
+
+        #Non matching passwords in reset data
+        self.non_match_reset_data = {
+            'password': "qwertyuiop",
+            'confirm_password': "qwertyio"
+        }
+
+        #An empty field for password in reset data
+        self.one_empty_reset_data = {
+            'password': "qwertyuiop",
+            'confirm_password': ""
+        }
+
+        #A missing field for password in reset data
+        self.miss_field_reset_data = {
+            'password': "qwertyuiop"
+        }
