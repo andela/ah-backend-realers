@@ -38,7 +38,7 @@
     "EMAIL_HOST":{
       "required": true
     },
-    "HOST_PASSWORD": {
+    "EMAIL_HOST_PASSWORD": {
       "required": true
     },
     "EMAIL_USE_TLS":{

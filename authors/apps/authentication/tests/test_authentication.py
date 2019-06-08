@@ -146,3 +146,119 @@ class AccountActivationAPIViewTestCase(TestBase):
 
         self.assertEqual("Account doesn't exist", response.data)
 
+class PasswordResetAPIViewTestCase(TestBase):
+    """
+    A test class that tests the PasswordResetView class in the views.py
+    file 
+    """
+
+    def test_password_reset_with_valid_email_existing_in_app(self):
+        #register test user into the app
+        self.client.post(self.register_url, self.user_data_real_email, format="json") 
+        url = reverse(
+            "authentication:reset_password")
+        response = self.client.post(url, self.user_data_real_email['user'], format="json")
+        expected = "Please check your email inbox for the Password Reset link we've sent"
+        self.assertEqual(expected, response.data['message'])
+
+    def test_password_reset_with_valid_email_absent_in_app(self):
+        url = reverse(
+            "authentication:reset_password")
+        response = self.client.post(url, self.user_data_real_email['user'], format="json")
+        expected = "This Email Address is not attached to any account"
+        self.assertEqual(expected, response.data['errors'][0])
+
+    def test_password_reset_with_invalid_email(self):
+        bad_email = {'email': "hgjfn"}
+        url = reverse(
+            "authentication:reset_password")
+        response = self.client.post(url, bad_email, format="json")
+        expected = "Provide a valid email address"
+        self.assertEqual(expected, response.data['errors'][0])
+
+    def test_password_reset_with_empty_email(self):
+        bad_email = {'email': ""}
+        url = reverse(
+            "authentication:reset_password")
+        response = self.client.post(url, bad_email, format="json")
+        expected = "The email field can not be blank"
+        self.assertEqual(expected, response.data['errors'][0])
+
+    def test_password_reset_without_email_in_request(self):
+        bad_email = {'d': "edfw"}
+        url = reverse(
+            "authentication:reset_password")
+        response = self.client.post(url, bad_email, format="json")
+        expected = "Please provide an Email Address"
+        self.assertEqual(expected, response.data['errors'][0])
+
+class CreateNewPasswordAPIViewTestCase(TestBase):
+    """
+    A test class that tests the CreateNewPasswordView class in the views.py
+    file 
+    """
+
+    def test_create_new_password_good_request(self):
+        #register test user into the app
+        self.client.post(self.register_url, self.user_data_real_email, format="json")
+
+        token = {
+            "token": self.reset_token
+        }
+        url = reverse(
+            "authentication:change_password", kwargs=token)
+        response = self.client.patch(url, self.reset_data, format="json")
+        expected = 'You have succesfully reset your password'
+        self.assertEqual(expected, response.data['message'])
+
+    def test_create_new_password_with_bad_token(self):
+        #register test user into the app
+        self.client.post(self.register_url, self.user_data_real_email, format="json")
+
+        token = {
+            "token": self.bad_reset_token
+        }
+        url = reverse(
+            "authentication:change_password", kwargs=token)
+        response = self.client.patch(url, self.reset_data, format="json")
+        expected = 'This is an invalidated link'
+        self.assertEqual(expected, response.data['errors'][0])
+
+    def test_create_new_password_with_non_matching_passwords(self):
+        #register test user into the app
+        self.client.post(self.register_url, self.user_data_real_email, format="json")
+
+        token = {
+            "token": self.reset_token
+        }
+        url = reverse(
+            "authentication:change_password", kwargs=token)
+        response = self.client.patch(url, self.non_match_reset_data, format="json")
+        expected = "Password is not macthing with Confirm_password!"
+        self.assertEqual(expected, response.data['errors'][0])
+
+    def test_create_new_password_with_an_empty_field(self):
+        #register test user into the app
+        self.client.post(self.register_url, self.user_data_real_email, format="json")
+
+        token = {
+            "token": self.reset_token
+        }
+        url = reverse(
+            "authentication:change_password", kwargs=token)
+        response = self.client.patch(url, self.one_empty_reset_data, format="json")
+        expected = "Provide both Password and Confirm_Password fields"
+        self.assertEqual(expected, response.data['errors'][0])
+
+    def test_create_new_password_with_a_missing_field(self):
+        #register test user into the app
+        self.client.post(self.register_url, self.user_data_real_email, format="json")
+
+        token = {
+            "token": self.reset_token
+        }
+        url = reverse(
+            "authentication:change_password", kwargs=token)
+        response = self.client.patch(url, self.miss_field_reset_data, format="json")
+        expected = "Provide both Password and Confirm_Password fields"
+        self.assertEqual(expected, response.data['errors'][0])
