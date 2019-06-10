@@ -23,7 +23,6 @@ omit =
     *settings/*
     *wsgi.py
     */settings.py
-    */mixins.py
-    */backends.py  
+    */mixins.py  
     */core/exceptions.py 
    

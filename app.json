@@ -31,6 +31,24 @@
     },
     "SECRET_KEY": {
       "required": true
+    },
+    "SECURITY_PASSWORD_SALT": {
+      "required": true
+    },
+    "EMAIL_HOST":{
+      "required": true
+    },
+    "HOST_PASSWORD": {
+      "required": true
+    },
+    "EMAIL_USE_TLS":{
+      "required": true
+    },
+    "EMAIL_PORT":{
+      "required": true
+    },
+    "EMAIL_HOST_USER":{
+      "required": true
     }
   },
   "formation": {
@@ -40,6 +58,7 @@
   },
   "name": "ah-backend-realers",
   "scripts": {
+    "postdeploy": "python manage.py makemigrations && python manage.py migrate"
   },
   "stack": "heroku-18"
 }
