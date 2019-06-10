@@ -140,7 +140,7 @@ class UserRetrieveUpdateAPIViewTestCase(TestBase):
     def test_fetch_user_from_system_with_Invalid_token(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer jhgsjfudstuydsfj')
         response = self.client.get('/api/user/')
-        self.assertIn("Invalid token", str(response.data))
+        self.assertIn("Token invalid or expired. please login again.", str(response.data))
 
     def test_fetch_user_from_system_with_no_token(self):
         response = self.client.get('/api/user/')
@@ -274,6 +274,19 @@ class CreateNewPasswordAPIViewTestCase(TestBase):
             "authentication:change_password", kwargs=token)
         response = self.client.patch(url, self.non_match_reset_data, format="json")
         expected = "Password is not macthing with Confirm_password!"
+        self.assertEqual(expected, response.data['errors'][0])
+
+    def test_create_new_password_with_less_characters(self):
+        #register test user into the app
+        self.client.post(self.register_url, self.user_data_real_email, format="json")
+
+        token = {
+            "token": self.reset_token
+        }
+        url = reverse(
+            "authentication:change_password", kwargs=token)
+        response = self.client.patch(url, self.less_password_chars, format="json")
+        expected = "Password length must be 8 or more characters"
         self.assertEqual(expected, response.data['errors'][0])
 
     def test_create_new_password_with_an_empty_field(self):

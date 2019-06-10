@@ -190,6 +190,12 @@ class TestBase(APITestCase):
             'confirm_password': "qwertyio"
         }
 
+        # password has less characters
+        self.less_password_chars = {
+            'password': "qwe",
+            'confirm_password': "qwe"
+        }
+
         #An empty field for password in reset data
         self.one_empty_reset_data = {
             'password': "qwertyuiop",

@@ -49,6 +49,18 @@
     },
     "EMAIL_HOST_USER":{
       "required": true
+    },
+    "SOCIAL_AUTH_FACEBOOK_KEY":{
+      "required": true
+    },
+    "SOCIAL_AUTH_FACEBOOK_SECRET":{
+      "required": true
+    },
+    "TWITTER_CONSUMER_KEY":{
+      "required": true
+    },
+    "TWITTER_CONSUMER_SECRET":{
+      "required": true
     }
   },
   "formation": {
