@@ -146,6 +146,15 @@ class UserRetrieveUpdateAPIViewTestCase(TestBase):
         response = self.client.get('/api/user/')
         self.assertIn("Authentication credentials were not provided.", str(response.data))
 
+    def test_update_user_profile(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(self.token))
+        response = self.client.put(
+            '/api/user/',
+            self.user_data_update,
+            format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("test@testuser.com", response.data.get('email'))
 
 class AccountActivationAPIViewTestCase(TestBase):
     """
@@ -291,4 +300,17 @@ class CreateNewPasswordAPIViewTestCase(TestBase):
             "authentication:change_password", kwargs=token)
         response = self.client.patch(url, self.miss_field_reset_data, format="json")
         expected = "Provide both Password and Confirm_Password fields"
+        self.assertEqual(expected, response.data['errors'][0])
+
+    def test_create_new_password_with_a_length_less_than_8(self):
+        #register test user into the app
+        self.client.post(self.register_url, self.user_data_real_email, format="json")
+
+        token = {
+            "token": self.reset_token
+        }
+        url = reverse(
+            "authentication:change_password", kwargs=token)
+        response = self.client.patch(url, self.with_invalid_length, format="json")
+        expected = "Password length must be 8 or more characters"
         self.assertEqual(expected, response.data['errors'][0])

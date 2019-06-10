@@ -13,8 +13,9 @@ class TestBase(APITestCase):
         self.url = reverse("authentication:login")
         self.register_url = reverse("authentication:register")
         self.acc_verify = AccountVerification
-        self.known_key = "InRlc3QyQHRlc3R1c2VyLmNvbSI.XPwXBQ.-MB4H7ykcxDwYSUw3HzvIeCo82k"
+        self.known_key = self.acc_verify().generate_confirmation_token('test2@testuser.com')
         self.invalid_key = "InRoeS5yZWFsZXJzQGdtYWlsLmNvbSI.XPkRcg.37n9xSNEqhyM9V_z94z-Q9vLQWwInvalid"
+
         self.user_data = {
             'user': {
                 'email': "test@testuser.com",
@@ -22,6 +23,18 @@ class TestBase(APITestCase):
                 'password': "password"
             }
         }
+        self.user_data_update = {
+                "user": {
+                    "email": "test@testuser.com",
+                    "username": "testuser", 
+                    "bio":"I am professional code tester",
+                    "gender": "male",
+                    "first_name": "Thy",
+                    "last_name": "Realers",
+                    "location": "Kampala",
+                    "birth_date": "2019-05-06"
+                }
+            }
         self.user_data_2 = {
             'user': {
                 'email': "test2@testuser.com",
@@ -186,4 +199,9 @@ class TestBase(APITestCase):
         #A missing field for password in reset data
         self.miss_field_reset_data = {
             'password': "qwertyuiop"
+        }
+
+        self.with_invalid_length = {
+            'password': "qwerty",
+            'confirm_password': "qwerty"
         }

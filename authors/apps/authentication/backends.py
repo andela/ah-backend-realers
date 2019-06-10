@@ -42,7 +42,7 @@ class AccountVerification:
         serializer = URLSafeTimedSerializer(environ.get("SECRET_KEY"))
         return serializer.dumps(email, salt=environ.get("SECURITY_PASSWORD_SALT"))
 
-    def verify_token(self, token, expiration=3600*12*365):
+    def verify_token(self, token, expiration=3600):
         # verify that the link is still active
         serializer = URLSafeTimedSerializer(environ.get("SECRET_KEY"))
         try:

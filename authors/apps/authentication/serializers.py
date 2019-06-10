@@ -7,6 +7,7 @@ from .validators import validate_email, validate_password, validate_username, va
 
 import re
 
+from authors.apps.profiles.serializers import ProfileSerializer
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializers registration requests and creates a new user."""
@@ -96,10 +97,27 @@ class UserSerializer(serializers.ModelSerializer):
         min_length=8,
         write_only=True
     )
+    # When a field should be handled as a serializer, we must explicitly say
+    # so. Moreover, `UserSerializer` should never expose profile information,
+    # so we set `write_only=True`.
+    profile = ProfileSerializer(write_only=True)
+
+    # We want to get the `bio` and `image` fields from the related Profile
+    # model.
+    bio = serializers.CharField(source='profile.bio', read_only=True)
+    image = serializers.URLField(source='profile.image', read_only=True)
+    gender = serializers.CharField(source='profile.gender', read_only=True)
+    first_name = serializers.CharField(source='profile.first_name', read_only=True)
+    last_name = serializers.CharField(source='profile.last_name', read_only=True)
+    location = serializers.CharField(source='profile.location', read_only=True)
+    birth_date = serializers.CharField(source='profile.birth_date', read_only=True)
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password')
+        fields = (
+            'email', 'username', 'password', 'profile', 'bio',
+            'image','gender','first_name','last_name','location','birth_date'
+        )
 
         # The `read_only_fields` option is an alternative for explicitly
         # specifying the field with `read_only=True` like we did for password
@@ -120,6 +138,11 @@ class UserSerializer(serializers.ModelSerializer):
         # `validated_data` dictionary before iterating over it.
         password = validated_data.pop('password', None)
 
+        # Like passwords, we have to handle profiles separately. To do that,
+        # we remove the profile data from the `validated_data` dictionary.
+        profile_data = validated_data.pop('profile', {})
+
+
         for (key, value) in validated_data.items():
             # For the keys remaining in `validated_data`, we will set them on
             # the current `User` instance one at a time.
@@ -134,6 +157,14 @@ class UserSerializer(serializers.ModelSerializer):
         # the model. It's worth pointing out that `.set_password()` does not
         # save the model.
         instance.save()
+
+        for (key, value) in profile_data.items():
+            # We're doing the same thing as above, but this time we're making
+            # changes to the Profile model.
+            setattr(instance.profile, key, value)
+
+        # Save the profile just like we saved the user.
+        instance.profile.save()
 
         return instance
 

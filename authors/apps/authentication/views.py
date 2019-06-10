@@ -22,7 +22,7 @@ from drf_yasg.utils import swagger_auto_schema
 from .backends import (
     AccountVerification
 )
-
+from authors.apps.profiles.models import Profile
 
 class RegistrationAPIView(APIView):
     # Allow any user (authenticated or not) to hit this endpoint.
@@ -97,10 +97,26 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_id='Update User Details',
+        request_body=serializer_class,
+        responses={201: serializer_class(many=False), 400: 'BAD REQUEST'},
+    )
+
+    def update(self, request, *args, **kwargs):
+        serializer_data = request.data.get('user', {})
+
+        serializer = self.serializer_class(
+            request.user, data=serializer_data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class AccountActivation(APIView):
     def get(self, request, **kwargs):
-        activation_key = kwargs.get('token') 
+        activation_key = kwargs.get('token')
         user = AccountVerification().verify_token(activation_key)
         response = AccountVerification.verify_user(user)
         return Response(response)

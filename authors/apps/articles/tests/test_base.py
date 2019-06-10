@@ -31,6 +31,13 @@ class ArticleBaseTest(TestBase):
                 "description": "all is good"
             }
         }
+        
+        self.wrong_request_body = {
+             "title": "Most people are good",
+            "description": "they are all gssood",
+            "body": "It is what they sghf gvsdf csbkfdgc cbghfgx df",
+            "image": "https://unsplash.com/photos/BW9ki_tmouE"            
+        }
 
         self.new_db_article = Article(
             title="Most people are good",
