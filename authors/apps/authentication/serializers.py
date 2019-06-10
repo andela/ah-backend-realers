@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from .models import User
 
+import re
+
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializers registration requests and creates a new user."""
@@ -11,10 +13,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # Ensure passwords are at least 8 characters long, no longer than 128
     # characters, and can not be read by the client.
     password = serializers.CharField(
-        max_length=128,
-        min_length=8,
         write_only=True
     )
+    email = serializers.EmailField()
+    username = serializers.CharField()
+    
     # The client should not be able to send a token along with a registration
     # request. Making `token` read-only handles that for us.
 
@@ -24,8 +27,38 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # or response, including fields specified explicitly above.
         fields = ['email', 'username', 'password', 'message']
 
+    def validate_username(self, username):
+        check_username = User.objects.filter(username=username)
+        if check_username.exists():
+            raise serializers.ValidationError("Username already exists")
+
+        elif not username.isalnum():
+            raise serializers.ValidationError(
+                "username should only contain letters and numbers")     
+        return username
+
+    def validate_email(self, email):
+        check_email = User.objects.filter(email=email)
+        if check_email.exists():
+            raise serializers.ValidationError(
+                "User with this email already exists")
+
+        elif re.search(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email) is None:
+            raise serializers.ValidationError(
+                "Please use a proper email format e.g jane@gmail.com")
+        return email
+
+    def validate_password(self, password):
+        if len(password) < 8 or len(password) == 0:
+            raise serializers.ValidationError(
+                "Password should contain atleast 8 characters")
+
+        if not password.isalnum():
+            raise serializers.ValidationError(
+                "Password should only contain letters and numbers")
+        return password
+
     def create(self, validated_data):
-        # Use the `create_user` method we wrote earlier to create a new user.
         return User.objects.create_user(**validated_data)
 
 
@@ -34,7 +67,6 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
-
 
     def validate(self, data):
         # The `validate` method is where we make sure that the current

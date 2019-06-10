@@ -16,6 +16,38 @@ class UserRegistrationAPIViewTestCase(TestBase):
         self.assertEqual("testuser", result['user']['username'])
         self.assertIn(output, str(result))
 
+    def test_Validate_email_invalid(self):
+        result = self.new_user
+        expected = "Enter a valid email address."
+        self.assertEqual(expected, result.data['errors']['email'][0])
+
+    def test_email_already_exists(self):
+        result = self.client.post(
+            self.register_url, self.user_data12, format="json")
+        expected = "User with this email already exists"
+        self.assertEqual(expected, result.data['errors']['email'][0])
+
+    def test_invalid_password(self):
+        response = self.new_user2
+        expected = "Password should contain atleast 8 characters"
+        self.assertIn(expected, response.data['errors']['password'][0])
+
+    def test_password_empty(self):
+        response = self.new_users2
+        expected = "This field may not be blank"
+        self.assertIn(expected, response.data['errors']['password'][0])
+
+    def test_validate_username_exist(self):
+        response = self.client.post(
+            self.register_url, self.user_data11, format="json")
+        expected = "Username already exists"
+        self.assertIn(expected, response.data['errors']['username'][0])
+
+    def test_username_has_special_characters(self):
+        response = self.new_users
+        expected = "username should only contain letters and numbers"
+        self.assertIn(expected, response.data['errors']['username'])
+
 
 class UserLoginAPIViewTestCase(TestBase):
     """ 
@@ -24,7 +56,7 @@ class UserLoginAPIViewTestCase(TestBase):
 
     def test_login_for_signed_up_user(self):
         self.assertEquals("test@testuser.com", self.logged_in_user.data["email"])
-        self.assertEqual(self.logged_in_user.status_code , status.HTTP_200_OK)
+        self.assertEqual(self.logged_in_user.status_code, status.HTTP_200_OK)
         self.assertIn('token', self.logged_in_user.data)
 
 
