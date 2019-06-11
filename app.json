@@ -49,6 +49,9 @@
     },
     "EMAIL_HOST_USER":{
       "required": true
+    },
+    "EMAIL_HOST_PASSWORD":{
+      "required":true
     }
   },
   "formation": {
