@@ -40,6 +40,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(('authors.apps.authentication.urls',
                           'authentication'), namespace='authentication')),
+    path('api/', include(('authors.apps.articles.urls',
+                            'articles'), namespace='articles')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('docs/', include_docs_urls(title='Author\'s Haven API')),
 ]
