@@ -29,18 +29,33 @@ class TestBase(APITestCase):
                 'password': "password2"
             }
         }
+
+        self.user_data_3 = {
+            'user': {
+                'email': "test3@testuser.com",
+                'username': "testuser3",
+                'password': "password3"
+            }
+        }
         self.new_test_user = self.client.post(
             self.register_url, self.user_data, format="json")
 
         self.new_test_user_2 = self.client.post(
             self.register_url, self.user_data_2, format="json")
 
+        self.new_test_user_3 = self.client.post(
+            self.register_url, self.user_data_3, format="json")
+
         # verifies user 1 account upon signup
         self.acc_verify.verify_user(self.user_data['user']['email'])
+        self.acc_verify.verify_user(self.user_data_3['user']['email'])
 
         # use the APIClient to log in the user to be tested against
         self.logged_in_user = self.client.post(
             self.url, self.user_data, format="json")
+
+        self.logged_in_user3 = self.client.post(
+            self.url, self.user_data_3, format="json")
 
         # individualise these to easily test against them
         self.username = "neelxie"
@@ -55,6 +70,7 @@ class TestBase(APITestCase):
 
         # Getting the token
         self.token = self.logged_in_user.data.get("token")
+        self.token1 = self.logged_in_user3.data.get("token")
 
         # create user when email is invalid
         self.user_data1 = {

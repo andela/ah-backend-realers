@@ -79,7 +79,7 @@ class AccountVerification:
             "token": self.generate_confirmation_token(email),
         }
 
-        verification_url = reverse(
+        verification_url = reverse( 
             "authentication:acc_verification", kwargs=kwargs)
 
         activation_url = "{0}://{1}{2}".format(
