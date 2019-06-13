@@ -37,6 +37,16 @@ class TestBase(APITestCase):
                 'password': "password3"
             }
         }
+
+        self.user_data_4 = {
+            'user': {
+                'email': "999",
+                'username': "99",
+                'password': "67676767"
+            }
+        }
+
+
         self.new_test_user = self.client.post(
             self.register_url, self.user_data, format="json")
 
@@ -49,6 +59,7 @@ class TestBase(APITestCase):
         # verifies user 1 account upon signup
         self.acc_verify.verify_user(self.user_data['user']['email'])
         self.acc_verify.verify_user(self.user_data_3['user']['email'])
+
 
         # use the APIClient to log in the user to be tested against
         self.logged_in_user = self.client.post(

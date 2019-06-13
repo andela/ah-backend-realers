@@ -16,11 +16,6 @@ class UserRegistrationAPIViewTestCase(TestBase):
         self.assertEqual("testuser", result['user']['username'])
         self.assertIn(output, str(result))
 
-    def test_Validate_email_invalid(self):
-        result = self.new_user
-        expected = "Enter a valid email address."
-        self.assertEqual(expected, result.data['errors']['email'][0])
-
     def test_email_already_exists(self):
         result = self.client.post(
             self.register_url, self.user_data12, format="json")
@@ -43,11 +38,17 @@ class UserRegistrationAPIViewTestCase(TestBase):
         expected = "Username already exists"
         self.assertIn(expected, response.data['errors']['username'][0])
 
-    def test_username_has_special_characters(self):
-        response = self.new_users
-        expected = "username should only contain letters and numbers"
-        self.assertIn(expected, response.data['errors']['username'])
-
+    def test_user_registration_with_invalid_credential(self):
+        response = self.client.post(
+            self.register_url, self.user_data_4, format='json'
+        )
+        email_error = "Email should not contain only numbers!"
+        username_error = "Username should not contain only numbers!"
+        password_error = "Password should not contain only numbers!"
+        self.assertAlmostEquals(response.status_code, 400)
+        self.assertIn(email_error, response.data['errors']['email'])
+        self.assertIn(username_error, response.data['errors']['username'])
+        self.assertIn(password_error, response.data['errors']['password'])
 
 class UserLoginAPIViewTestCase(TestBase):
     """ 
@@ -85,11 +86,40 @@ class UserLoginAPIViewTestCase(TestBase):
             }},
             format="json")
 
+        response2 = self.client.post(
+            self.url,
+            {"user": {
+                "email": "emmarealers.com",
+                "password": "donthack"
+            }},
+            format="json")
+
+        response3 = self.client.post(
+            self.url,
+            {"user": {
+                "email": "emmarealers.com",
+                "password": "dont-  hack"
+            }},
+            format="json")
+
         self.assertIn(
-            'A user with this email and password was not found.',
-            response.data["errors"]["error"]
+            'User with this email does not exist!',
+            response.data["errors"]["email"]
         )
+
+        self.assertIn(
+            'Password should only contain letters and numbers',
+            response3.data["errors"]["password"]
+        )
+        
+        self.assertIn(
+            "Please use a proper email format e.g janedoe@gmail.com",
+            response2.data["errors"]["email"]
+        )
+        
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response3.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class UserRetrieveUpdateAPIViewTestCase(TestBase):

@@ -26,6 +26,12 @@ class ArticleBaseTest(TestBase):
             }
         }
 
+        self.article_data2 = {
+            "article": {
+                "description": "all is good"
+            }
+        }
+
         self.new_db_article = Article(
             title="Most people are good",
             description="they are all good",
@@ -33,6 +39,7 @@ class ArticleBaseTest(TestBase):
             image="https://unsplash.com/photos/BW9ki_tmouE"
 
         )
+
 
         self.new_db_new_article = Article(
             title="Most people are good",
