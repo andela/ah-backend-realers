@@ -44,6 +44,8 @@ urlpatterns = [
                             'articles'), namespace='articles')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('docs/', include_docs_urls(title='Author\'s Haven API')),
+    path('api/articles/', include(('authors.apps.comments.urls',
+                            'comments'), namespace='comments')),
     path('api/profiles/', include('authors.apps.profiles.urls', namespace='profiles')),
     path('api/', include(('authors.apps.ratings.urls', 'ratings'), namespace='ratings'))
 ]
