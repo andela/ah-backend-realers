@@ -23,7 +23,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             'updatedAt',
             'author',
             'slug',
-            'image'
+            'image',
+            'average_rating'
         ]
-
-    
+        

@@ -1,6 +1,9 @@
 from django.db import models
 from authors.apps.authentication.models import User
 from django.utils import text
+from rest_framework.response import Response
+from django.db.models import Avg
+
 
 
 class Article(models.Model):
@@ -9,7 +12,8 @@ class Article(models.Model):
     body = models.TextField(unique=True)
     createdAt = models.DateTimeField(auto_now_add=True, editable=False)
     updatedAt = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author')
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='author')
     slug = models.SlugField()
     image = models.URLField(blank=True, default='url', max_length=200)
 
@@ -28,3 +32,16 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+    def average_rating(self):
+        from authors.apps.ratings.models import Rating
+
+        article = Article.objects.filter(id=self.id).first()
+        if article:
+            queryset = Rating.objects.all().filter(
+                article_id=article.id)
+            if queryset.exists():
+                article_average = queryset.aggregate(Avg('ratings'))
+                rating = article_average.get('ratings__avg')
+                return rating
+        return 0
