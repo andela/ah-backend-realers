@@ -27,11 +27,8 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
     def authenticate_credentials(self, request, token):
         user_id = authentication_token.decode_auth_token(token)
-        try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            raise exceptions.AuthenticationFailed(
-                "This account does not exist. Please signup")
+        user = User.objects.get(pk=user_id)
+        
         if not user.is_active:
             raise exceptions.AuthenticationFailed("This account is not yet active")
         return (user, token)

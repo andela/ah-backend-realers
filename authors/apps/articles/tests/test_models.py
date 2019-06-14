@@ -7,7 +7,6 @@ class ArticleModelTest(ArticleBaseTest):
         user = User.objects.first()
         self.new_db_article.author = user
         self.new_db_article.save()
-        print(self.new_db_article)
         self.new_db_new_article.author = user
         self.new_db_new_article.save()
         self.assertTrue(self.new_db_new_article)

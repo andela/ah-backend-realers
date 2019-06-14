@@ -2,6 +2,7 @@ from django.db import models
 from authors.apps.authentication.models import User
 from django.utils import text
 
+
 class Article(models.Model):
     title = models.CharField(db_index=True, max_length=255)
     description = models.TextField()
