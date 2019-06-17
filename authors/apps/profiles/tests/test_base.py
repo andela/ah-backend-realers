@@ -19,6 +19,17 @@ class ProfileTestBase(UserTestBaseCase):
             }
         }
 
+        self.another_valid_profile = {
+            "profile": {
+                "bio":"I am the greatest coder",
+                "gender": "male",
+                "first_name": "Owaye",
+                "last_name": "nvaakko",
+                "location": "Kampala",
+                "birth_date": "2018-07-06"
+            }
+        }
+
         self.profile_invalid_firstname = {
             "profile": {
                 "first_name": "89ehwjkewr",

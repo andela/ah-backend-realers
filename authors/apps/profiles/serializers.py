@@ -5,11 +5,13 @@ import re
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
     bio = serializers.CharField(allow_blank=True, required=False)
+    follows = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
         fields = ('username', 'first_name', 'last_name', 'bio',
-                  'image', 'gender', 'location', 'birth_date','created_at','updated_at')
+                  'image', 'gender', 'location', 'birth_date',
+                  'created_at','updated_at', 'follows',)
         read_only_fields = ('username','created_at')
 
     def get_image(self, obj):
@@ -37,3 +39,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         if last_name:
             self.check_for_digits(last_name)
         return last_name
+
+    def get_follows(self, instance):
+        request = self.context.get('request', None)
+
+        if request is None:
+            return False
+
+        follower = request.user.profile
+
+        return follower.is_following(instance)

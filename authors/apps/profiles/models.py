@@ -22,6 +22,10 @@ class Profile(TimestampedModel):
     location = models.CharField(max_length=100, blank=True)
     birth_date = models.DateField(null=True, blank=True)
 
+    # profiles means profile models and symmetrical prevents default follow back
+    following = models.ManyToManyField(
+        'self', related_name='followed_by', symmetrical=False)
+
     def __str__(self):
         """
         Returns a string representation of this `Profile`.
@@ -29,6 +33,22 @@ class Profile(TimestampedModel):
         This string is used when a `Profile` is printed in the console.
         """
         return self.user.username
+
+    def unfollow(self, profile):
+        """
+        method to unfollow an author
+        """
+        self.following.remove(profile)
+
+    def follow(self, profile):
+        """
+        method to follow another author 
+        """
+        self.following.add(profile)
+
+    def is_following(self, profile):
+        return self.following.filter(pk=profile.pk).exists()
+
 
 
 @receiver(post_save, sender=User)
