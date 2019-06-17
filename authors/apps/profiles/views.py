@@ -87,7 +87,9 @@ class FollowProfileAPIView(APIView):
         try:
             profile_followed = Profile.objects.get(
                 user__username=username)
+
         except Profile.DoesNotExist: 
+
             raise ProfileDoesNotExist
 
         if not profile_followa.is_following(profile_followed):
@@ -101,6 +103,7 @@ class FollowProfileAPIView(APIView):
             'request': request
         })
 
+
         response = {
             "data":serializer.data['username'],
             "message":"You have just unfollowed this author",
@@ -108,6 +111,7 @@ class FollowProfileAPIView(APIView):
         }
 
         return Response(response, status=status.HTTP_201_CREATED)
+
 
     def post(self, request, username=None):
         follower = self.request.user.profile
@@ -118,7 +122,9 @@ class FollowProfileAPIView(APIView):
             raise NotFound('No profile matches this username')
 
         if follower.pk is profile_followed.pk:
+
             raise serializers.ValidationError( # pragma: no cover
+
                 'As an author you can not follow yourself.')
 
         if follower.is_following(profile_followed):
@@ -131,6 +137,7 @@ class FollowProfileAPIView(APIView):
             'request': request
         })
 
+
         response = {
             "data":serializer.data['username'],
             "message":"You have followed this author",
@@ -138,6 +145,7 @@ class FollowProfileAPIView(APIView):
         }
 
         return Response(response, status=status.HTTP_201_CREATED)
+
 
 class FollowersAndFollowingAPIView(APIView):
     """
