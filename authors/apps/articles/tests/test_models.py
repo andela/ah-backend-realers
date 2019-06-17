@@ -10,3 +10,7 @@ class ArticleModelTest(ArticleBaseTest):
         self.new_db_new_article.author = user
         self.new_db_new_article.save()
         self.assertTrue(self.new_db_new_article)
+
+    def test_object_returns_article_title(self):
+        article = Article.objects.first()
+        self.assertIn('Most people are good', str(article))

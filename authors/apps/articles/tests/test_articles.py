@@ -65,3 +65,20 @@ class ArticleTest(ArticleBaseTest):
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_update_article_without_permission(self):
+        self.client.credentials()
+        response = self.client.patch(
+            self.article_url + 'most-people-are-good/',
+            data=self.article_data1,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_article_fails_with_bad_request_body(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(self.token))
+        response = self.client.patch(
+            self.article_url + 'most-people-are-good/',
+            data=self.wrong_request_body,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
