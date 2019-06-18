@@ -29,7 +29,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         user_id = authentication_token.decode_auth_token(token)
         user = User.objects.get(pk=user_id)
         
-        if not user.is_active:
+        if not user.is_active: # pragma: no cover
             raise exceptions.AuthenticationFailed("This account is not yet active")
         return (user, token)
 

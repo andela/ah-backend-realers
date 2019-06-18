@@ -16,7 +16,5 @@ class AuthenticationToken:
         try:
             payload = jwt.decode(token, SECRET_KEY)
             return payload['id']
-        except jwt.ExpiredSignatureError:
-            raise exceptions.AuthenticationFailed("Token expired. please login again.")
-        except jwt.InvalidTokenError:
-            raise exceptions.AuthenticationFailed("Invalid token")
+        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+            raise exceptions.AuthenticationFailed("Token invalid or expired. please login again.")

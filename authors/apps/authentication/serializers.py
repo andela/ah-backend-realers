@@ -186,3 +186,27 @@ class SetNewPasswordSerializer(serializers.Serializer):
     class Meta:
         model = User
         fields = ('password', 'confirm_password')
+
+
+class FacebookAndGoogleSerializer(serializers.Serializer):
+    """
+    This class implements serialization and deserialization of 
+    for the facebook and google.
+    """
+    access_token = serializers.CharField(
+        max_length=255, required=True, trim_whitespace=True)
+    class Meta:
+        model = User
+        fields = ('acess_token')
+
+class TwitterSerializer(serializers.Serializer):
+    """
+    This is a serializer for the twitter class
+    """
+    access_token = serializers.CharField(
+        max_length=255, required=True, trim_whitespace=True)
+    access_token_secret = serializers.CharField(
+        max_length=255, required=True, trim_whitespace=True)
+    class Meta:
+        model = User
+        fields = ('access_token', 'access_token_secret')
