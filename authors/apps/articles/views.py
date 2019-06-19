@@ -40,8 +40,10 @@ class ArticleRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
             article, 
             partial=True
         )
-        
-        return Response(serializer.data, status.HTTP_200_OK)
+
+        return Response({
+            "data": serializer.data,
+        }, status.HTTP_200_OK)
 
     def patch(self, request, *args, **kwargs):
         is_authenticated(request)

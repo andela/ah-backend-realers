@@ -17,6 +17,15 @@ class ArticleBaseTest(TestBase):
             }
         }
 
+        self.article_data22 = {
+            "article": {
+                "title": "l love food",
+                "description": "they all like food",
+                "body": "l like eating well",
+                "image": "https://unsplash.com/photos/BW9ki_tmouE"
+            }
+        }
+
         self.article_data1 = {
             "article": {
                 "title": "Most people are good",
@@ -39,6 +48,10 @@ class ArticleBaseTest(TestBase):
             "image": "https://unsplash.com/photos/BW9ki_tmouE"            
         }
 
+        self.rating_data = {
+            "ratings": 1
+        }
+
         self.new_db_article = Article(
             title="Most people are good",
             description="they are all good",
@@ -46,7 +59,6 @@ class ArticleBaseTest(TestBase):
             image="https://unsplash.com/photos/BW9ki_tmouE"
 
         )
-
 
         self.new_db_new_article = Article(
             title="Most people are good",
@@ -66,3 +78,21 @@ class ArticleBaseTest(TestBase):
             format='json'
         )
         return response
+
+    def create_dummy_article(self):
+        response = self.client.post(
+            self.article_url,
+            self.article_data,
+            format='json'
+        )
+        return response.data
+
+    def create_new_dummy_article(self):
+        response = self.client.post(
+            self.article_url,
+            self.article_data22,
+            format='json'
+        )
+        return response.data
+
+        
