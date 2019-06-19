@@ -9,13 +9,17 @@ from authors.apps.authentication.models import User
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from django.shortcuts import get_object_or_404,get_list_or_404
-import json
-from rest_framework.exceptions import PermissionDenied 
+import json 
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.exceptions import PermissionDenied
+from .pagination import ArticleSetPagination
+
+
 class ArticleView(ListCreateAPIView):
+    queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    queryset = Article.objects.all()
+    pagination_class = ArticleSetPagination
 
     def post(self, request):
         article = request.data.get("article", {})
@@ -25,8 +29,10 @@ class ArticleView(ListCreateAPIView):
         serializer.save(
             author=User.objects.filter(username=request.user.username).first()
         )
-        response = {"success": "Article successfully created!",
-                    "data": serializer.data}
+        response = {
+            "success": "Article successfully created!", 
+            "data": serializer.data
+            }
         return Response(response, status=status.HTTP_201_CREATED)
 
 
@@ -91,6 +97,7 @@ class ArticleRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
             "status": status.HTTP_400_BAD_REQUEST
         }, status.HTTP_400_BAD_REQUEST)
 
+
     def delete(self, request, **kwargs):
         is_authenticated(request)
         article = Article.objects.filter(slug=kwargs.get('slug')).first()
@@ -106,7 +113,12 @@ class ArticleRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
         article.delete()
         response = {"success": "Article successfully deleted!",
                     "article": serializer.data}
+        response = {
+            "success": "Article successfully deleted!", 
+            "article": serializer.data
+            }
         return Response(response, status.HTTP_200_OK)
+
 
 def is_authenticated(request):
     user = request.user.id
