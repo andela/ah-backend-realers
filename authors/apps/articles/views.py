@@ -14,6 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import PermissionDenied
 from .pagination import ArticleSetPagination
 
+from authors.apps.article_tagging.views import ArticleTaggingViewSet
 
 class ArticleView(ListCreateAPIView):
     queryset = Article.objects.all()
@@ -23,7 +24,7 @@ class ArticleView(ListCreateAPIView):
 
     def post(self, request):
         article = request.data.get("article", {})
-
+        check_tag_is_provided(article)
         serializer = self.serializer_class(data=article)
         serializer.is_valid(raise_exception=True)
         serializer.save(
@@ -70,21 +71,22 @@ class ArticleRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
 
     def patch(self, request, *args, **kwargs):
         is_authenticated(request)
-        article = Article.objects.filter(slug=kwargs.get('slug')).first()
-        if not article:
+        article_object = Article.objects.filter(slug=kwargs.get('slug')).first()
+        if not article_object:
             return Response({
                 "message": "Article does not exist"
             }, status.HTTP_404_NOT_FOUND)
-        if request.user.username != article.author.username:
+        if request.user.username != article_object.author.username:
             return Response({
                 "message": "You do not have permision to update this article"
             }, status.HTTP_401_UNAUTHORIZED)
 
-        article_data = request.data.get("article", {})
-        if article_data:
+        article = request.data.get("article", {})
+        if article:
+            check_tag_is_provided(article)
             serializer = self.serializer_class(
-                article,
-                data=article_data,
+                article_object,
+                data=article,
                 partial=True
             )
             serializer.is_valid(raise_exception=True)
@@ -226,3 +228,12 @@ class UserFavouriteArticles(RetrieveAPIView):
             "status":status.HTTP_200_OK
             }
         return Response(response, status=status.HTTP_200_OK)
+
+def check_tag_is_provided(article):
+    if "tagName" in article:
+        #create tag if it doesnt exist
+        tag_names = ArticleTaggingViewSet.create_tag_if_provided_is_inexistent(
+            ArticleTaggingViewSet, article.get('tagName')
+        )
+
+        article['tagName'] = tag_names

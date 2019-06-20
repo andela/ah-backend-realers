@@ -19,6 +19,17 @@ class ArticleTest(ArticleBaseTest):
         self.assertIn('Article with this body already exists!',
                       str(response.data))
 
+    def test_create_article_with_invalid_tagname_fails(self):
+        self.article_data['article']['tagName'] = "should_a_list"
+        self.article_data['article']['body'] = "should_a_list"
+        response = self.client.post(
+            self.article_url,
+            self.article_data,
+            format='json'
+        )
+        self.assertIn('Provide a valid tag list like ',
+                      str(response.data))
+
     def test_get_article(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(self.token))
 
@@ -50,6 +61,18 @@ class ArticleTest(ArticleBaseTest):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_article_with_invalid_tagname_fails(self):
+        self.article_data['article']['tagName'] = ["should_a_list"]
+        self.article_data['article']['body'] = "should_a_list"
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(self.token))
+        response = self.client.patch(
+            self.article_url + 'most-people-are-good/',
+            data=self.article_data,
+            format='json'
+        )
+        self.assertIn('Tag name should only contain letter',
+                      str(response.data))
 
     def test_update_article_with_non_existant_article(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(self.token))

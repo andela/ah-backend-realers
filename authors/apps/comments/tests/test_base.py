@@ -77,7 +77,8 @@ class TestBase(APITestCase):
                 "title": "kings",
                 "description": "they are fly",
                 "body": "It is what they do",
-                "image": "https://unsplash.com/"
+                "image": "https://unsplash.com/",
+                "tagName":["people", "love"]
             }
         }
 
@@ -86,7 +87,8 @@ class TestBase(APITestCase):
                 "title": "kingss",
                 "description": "they are flying",
                 "body": "It is what they do it",
-                "image": "https://unsplashf.com/"
+                "image": "https://unsplashf.com/",
+                "tagName":["people", "love"]
             }
         }
 

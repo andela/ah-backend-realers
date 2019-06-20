@@ -34,7 +34,8 @@ class RatingsBaseTestCase(TestBase):
                 "title": "Most people are good",
                 "description": "they are all good",
                 "body": "is believed that most poeple love what tcbghfgx df",
-                "image": "https://unsplash.com/photos/BW9ki_tmouE"
+                "image": "https://unsplash.com/photos/BW9ki_tmouE",
+                "tagName":["people", "love"]
             }
         }
 
@@ -43,7 +44,8 @@ class RatingsBaseTestCase(TestBase):
                 "title": "Most people",
                 "description": "they is all good",
                 "body": "is believed that most poeple love what tcbghfgx df",
-                "image": "https://unsplash.com/photos/BW9ki_tmouE"
+                "image": "https://unsplash.com/photos/BW9ki_tmouE",
+                "tagName":["people", "love"]
             }
         }
 

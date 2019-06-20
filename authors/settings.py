@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'authors.apps.articles',
     'authors.apps.ratings',
     'authors.apps.comments',
+    'authors.apps.article_tagging',
     'whitenoise.runserver_nostatic',
 ]
 

@@ -3,7 +3,7 @@ from authors.apps.authentication.models import User
 from django.utils import text
 from rest_framework.response import Response
 from django.db.models import Avg
-
+from authors.apps.article_tagging.models import ArticleTagging
 
 
 class Article(models.Model):
@@ -16,6 +16,9 @@ class Article(models.Model):
         User, on_delete=models.CASCADE, related_name='author')
     slug = models.SlugField()
     image = models.URLField(blank=True, default='url', max_length=200)
+    tagName = models.ManyToManyField(
+        ArticleTagging, related_name="articles", blank=True
+    )
 
     def slug_generator(self):
         num = 1

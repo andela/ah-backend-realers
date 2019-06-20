@@ -13,7 +13,8 @@ class ArticleBaseTest(TestBase):
                 "title": "Most people are good",
                 "description": "they are all good",
                 "body": "is believed that most poeple love what tcbghfgx df",
-                "image": "https://unsplash.com/photos/BW9ki_tmouE"
+                "image": "https://unsplash.com/photos/BW9ki_tmouE",
+                "tagName":["people", "love"]
             }
         }
 
@@ -22,7 +23,8 @@ class ArticleBaseTest(TestBase):
                 "title": "l love food",
                 "description": "they all like food",
                 "body": "l like eating well",
-                "image": "https://unsplash.com/photos/BW9ki_tmouE"
+                "image": "https://unsplash.com/photos/BW9ki_tmouE",
+                "tagName":["people", "love"]
             }
         }
 
@@ -31,13 +33,23 @@ class ArticleBaseTest(TestBase):
                 "title": "Most people are good",
                 "description": "they are all gssood",
                 "body": "It is what they sghf gvsdf csbkfdgc cbghfgx df",
-                "image": "https://unsplash.com/photos/BW9ki_tmouE"
+                "image": "https://unsplash.com/photos/BW9ki_tmouE",
+                "tagName":["people","love"]
+            }
+        }
+        self.article_no_tag = {
+            "article": {
+                "title": "no tags",
+                "description": "I have no tags",
+                "body": "I am an article with no tags",
+                "image": "https://unsplash.com/photos/BW9ki_tmouE",
             }
         }
 
         self.article_data2 = {
             "article": {
-                "description": "all is good"
+                "description": "all is good",
+                "tagName":["people", "love"]
             }
         }
         
@@ -53,20 +65,23 @@ class ArticleBaseTest(TestBase):
         }
 
         self.new_db_article = Article(
+            id=int(90),
             title="Most people are good",
             description="they are all good",
             body="It is believed that most poeple love what they sghf gvsdfdf",
-            image="https://unsplash.com/photos/BW9ki_tmouE"
-
+            image="https://unsplash.com/photos/BW9ki_tmouE",
         )
+        self.new_db_article.tagName.articles = ["people"]
 
         self.new_db_new_article = Article(
+            id=int(89),
             title="Most people are good",
             description="they are all good",
             body="It is believed that most poeple and yes love what they sghf gvsdf csbkfdgc cbghfgx df",
             image="https://unsplash.com/photos/BW9ki_tmouE"
-
         )
+        self.new_db_new_article.tagName.articles = ["people"]
+
         self.create_new_article = self.create_article()
 
     def create_article(self):

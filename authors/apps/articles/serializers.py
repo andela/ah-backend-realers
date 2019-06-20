@@ -4,6 +4,7 @@ from authors.apps.authentication.serializers import UserSerializer
 import re
 
 from .validators import validate_body, check_title, check_desription
+from authors.apps.article_tagging.models import ArticleTagging
 
 class ArticleSerializer(serializers.ModelSerializer):
     author = UserSerializer(required=False)
@@ -12,6 +13,12 @@ class ArticleSerializer(serializers.ModelSerializer):
     title = serializers.CharField(validators=[check_title])
     body = serializers.CharField(validators=[validate_body])
     description = serializers.CharField(validators=[check_desription])
+    tagName = serializers.SlugRelatedField(
+        many=True,
+        queryset=ArticleTagging.objects.all(),
+        slug_field='tag_name',
+        required=False
+    )
 
     class Meta:
         model = Article
@@ -24,7 +31,8 @@ class ArticleSerializer(serializers.ModelSerializer):
             'author',
             'slug',
             'image',
-            'average_rating'
+            'average_rating',
+            'tagName',
         ]
 
 class FavoriteAnArticleSerializer(serializers.ModelSerializer):
