@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from django.db.models import Avg
 from authors.apps.article_tagging.models import ArticleTagging
 
-
 class Article(models.Model):
     title = models.CharField(db_index=True, max_length=255)
     description = models.TextField()

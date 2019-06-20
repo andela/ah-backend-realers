@@ -8,11 +8,15 @@ from .models import Article, FavoriteAnArticle
 from authors.apps.authentication.models import User
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
-from django.shortcuts import get_object_or_404,get_list_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 import json 
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import PermissionDenied
 from .pagination import ArticleSetPagination
+
+from .filters import ArticleFilter
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 from authors.apps.article_tagging.views import ArticleTaggingViewSet
 
@@ -21,6 +25,10 @@ class ArticleView(ListCreateAPIView):
     serializer_class = ArticleSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = ArticleSetPagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
+    filter_class = ArticleFilter
+    search_fields = ('title', 'description', 'author__username', 'tagName__tag_name')
+    filterset_feilds = ('title', 'author__username', 'tagName')
 
     def post(self, request):
         article = request.data.get("article", {})
