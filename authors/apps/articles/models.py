@@ -45,8 +45,16 @@ class Article(models.Model):
                 rating = article_average.get('ratings__avg')
                 return rating
         return 0
+
+
 class FavoriteAnArticle(models.Model):
 
     is_favorited = models.BooleanField(default=False)
     favorited_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+
+class LikeAnArticle(models.Model):
+    is_liked = models.BooleanField(default=False)
+    liked_by = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)

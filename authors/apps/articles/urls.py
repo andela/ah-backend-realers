@@ -1,6 +1,7 @@
 from django.urls import path, include
 from .views import (ArticleView, ArticleRetrieveUpdateDestroy,
-                    FavoriteUnfavoriteAnArticle, UserFavouriteArticles)
+                    FavoriteUnfavoriteAnArticle, UserFavouriteArticles,
+                    LikeUnlikeAnArticle, UserLikedArticles)
 
 urlpatterns = [
     path('articles/', ArticleView.as_view(), name="articles"),
@@ -10,4 +11,8 @@ urlpatterns = [
          FavoriteUnfavoriteAnArticle.as_view(), name='favorite'),
     path('favorite-articles/', UserFavouriteArticles.as_view(),
          name="favorite_articles"),
+    path('articles/<slug:slug>/like/',
+         LikeUnlikeAnArticle.as_view(), name='like'),
+    path('liked-articles/', UserLikedArticles.as_view(),
+         name="liked_articles"),
 ]

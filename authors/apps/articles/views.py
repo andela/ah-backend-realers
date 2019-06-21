@@ -3,8 +3,8 @@ from rest_framework.generics import (
     ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView, DestroyAPIView, RetrieveAPIView)
 from rest_framework import status,exceptions
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
-from .serializers import ArticleSerializer, FavoriteAnArticleSerializer
-from .models import Article, FavoriteAnArticle
+from .serializers import ArticleSerializer, FavoriteAnArticleSerializer, LikeAnArticleSerializer
+from .models import Article, FavoriteAnArticle, LikeAnArticle
 from authors.apps.authentication.models import User
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
@@ -54,13 +54,13 @@ class ArticleRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
             serializer = FavoriteAnArticleSerializer(
                 favorited,
                 partial=True
-            ) 
+            )
         except ObjectDoesNotExist:
             serializer = self.serializer_class(
                 article,
                 partial=True
             )
-
+        
         response = {
             "message":"article successful retrieved",
             "data":serializer.data,
@@ -111,8 +111,6 @@ class ArticleRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
             partial=True
         )
         article.delete()
-        response = {"success": "Article successfully deleted!",
-                    "article": serializer.data}
         response = {
             "success": "Article successfully deleted!", 
             "article": serializer.data
@@ -222,6 +220,105 @@ class UserFavouriteArticles(RetrieveAPIView):
         serializer = self.serializer_class(fav_articles, many=True) 
         response = {
             "message": "retrieved all user favorite articles successfully",
+            "data": serializer.data,
+            "status":status.HTTP_200_OK
+            }
+        return Response(response, status=status.HTTP_200_OK)
+
+class LikeUnlikeAnArticle(CreateAPIView, DestroyAPIView):
+    """A user can react to an article by liking it """
+
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    queryset = LikeAnArticle.objects.all()
+    serializer_class = LikeAnArticleSerializer
+    article_serializer_class = ArticleSerializer
+
+    def check_article_exists(self, **kwargs):
+        """
+        Check whether the article with specified slug exists
+        """
+        try:
+            article = get_object_or_404(Article, slug=kwargs.get("slug"))
+            return article
+        except:
+            raise exceptions.ValidationError({"message": "Article doesn't exit"})
+
+    
+    def post(self, request, **kwargs):
+        """
+        Like an article with specified slug
+        """
+        message =  "You already liked this article"
+        article = self.check_article_exists(**kwargs)
+        like = LikeAnArticle.objects.filter(
+            liked_by=request.user, article=article
+        )
+        if not like:
+            serializer = self.serializer_class(data={"is_liked": True})
+            serializer.is_valid(raise_exception=True)
+            serializer.save(article=article, liked_by=request.user)
+
+            message = "You have liked this article successfully"
+        return Response(
+            {
+                "message": message,
+                "status": status.HTTP_200_OK,
+                "data": {
+                    "article": {
+                        "title": str(article)
+                    }
+                }
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    def delete(self, request, **kwargs):
+        """
+        Unlike an article
+        """
+        queryset = LikeAnArticle.objects.filter(liked_by=request.user)
+        article = self.check_article_exists(**kwargs)
+        message = "You have not liked this article yet"
+        status_code = status.HTTP_400_BAD_REQUEST
+        liked_article = queryset.filter(
+            article_id=(
+                article
+            ).id
+        ).first()
+
+        LikeAnArticleSerializer(liked_article)
+
+        if liked_article:
+            self.perform_destroy(liked_article)
+            message = "This article has been unliked successfully"
+            status_code = status.HTTP_200_OK
+        
+        return Response(
+            {
+                "message": message,
+                "status": status_code,
+                "data": {
+                    "article": {
+                        "title": str(article)
+                    }
+                }
+            },
+            status_code,
+        )
+
+class UserLikedArticles(RetrieveAPIView):
+    permission_class = IsAuthenticated
+    serializer_class = ArticleSerializer
+    def retrieve(self, request):
+
+        is_authenticated(request)
+
+        liked_articles = Article.objects.filter(
+            likeanarticle__liked_by = request.user.id
+        ).all()
+        serializer = self.serializer_class(liked_articles, many=True) 
+        response = {
+            "message": "retrieved all user liked articles successfully",
             "data": serializer.data,
             "status":status.HTTP_200_OK
             }

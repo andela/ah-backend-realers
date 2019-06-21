@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from authors.apps.articles.models import Article,FavoriteAnArticle
+from authors.apps.articles.models import Article,FavoriteAnArticle, LikeAnArticle
 from authors.apps.authentication.serializers import UserSerializer
 import re
 
@@ -36,3 +36,13 @@ class FavoriteAnArticleSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = FavoriteAnArticle
         read_only_fields = ['favorited_by', 'article']
+
+class LikeAnArticleSerializer(serializers.ModelSerializer):
+
+    article = ArticleSerializer(required=False)
+    liked_by = UserSerializer(required=False)
+
+    class Meta:
+        fields = '__all__'
+        model = LikeAnArticle
+        read_only_fields = ['liked_by', 'article']
