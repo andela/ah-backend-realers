@@ -147,11 +147,6 @@ class FavoriteUnfavoriteAnArticle(CreateAPIView, DestroyAPIView):
         except:
             raise exceptions.ValidationError({"message": "Article doesn't exit"})
 
-    @swagger_auto_schema(
-        operation_description='Favorite an Article.',
-        operation_id='favorite an article',
-        responses={200: serializer_class(many=False), 400: 'BAD REQUEST'},
-    )
     def post(self, request, **kwargs):
         """
         Favorite an article with specified slug
@@ -180,12 +175,6 @@ class FavoriteUnfavoriteAnArticle(CreateAPIView, DestroyAPIView):
             status=status.HTTP_200_OK,
         )
 
-    @swagger_auto_schema(
-        operation_description='Unfavorite an Article.',
-        operation_id='unfavorite an article',
-        request_body=None,
-        responses={200: serializer_class(many=False), 400: 'BAD REQUEST'},
-    )
     def delete(self, request, **kwargs):
         """
         Unfavorite an article

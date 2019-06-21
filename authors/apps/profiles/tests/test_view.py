@@ -15,7 +15,7 @@ class UpdateGetUserProfileAPIViewTestCase(ProfileTestBase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + str(self.token))
         response = self.client.get(
             # unlike other routes this has no key name
-            # touse to refer to it in the urls file
+            # to use to refer to it in the urls file
             '/api/profiles/testuser/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('username'), 'testuser')
