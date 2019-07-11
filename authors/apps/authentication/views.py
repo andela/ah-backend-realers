@@ -244,7 +244,7 @@ class FacebookAPIView(APIView):
     )
     def post(self, request):
 
-        user_data = request.GET.get("access_token")
+        user_data = request.data.get("user", {})
         # get the token
         try:
             facebook_acct_user = facebook.GraphAPI(access_token=user_data)
@@ -273,7 +273,7 @@ class GoogleAPIView(APIView):
     )
     def post(self, request):
 
-        googl_auth_token = request.GET.get("access_token")
+        googl_auth_token = request.data.get("user", {})
         # get the token
         try:
             user_cred = id_token.verify_oauth2_token(
