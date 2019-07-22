@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'django_extensions',
+    'django_filters',
     'rest_framework',
     'drf_yasg',
 
@@ -171,6 +172,9 @@ REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'authors.apps.authentication.backends.JWTAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend', 
     ),
 }
 
