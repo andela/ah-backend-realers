@@ -170,14 +170,12 @@ class PasswordResetView(APIView):
         serializer = URLSafeTimedSerializer(os.environ.get("SECRET_KEY"))
         token = serializer.dumps(email, salt=os.environ.get("SECURITY_PASSWORD_SALT"))
         
-        BASE_URL = request.get_host()
-        url_scheme = request.scheme
-        reset_link = "{}://{}/api/users/change-password/{}/".format(url_scheme,BASE_URL,token)
+        reset_link = "https://authors-frontend-staging.herokuapp.com/change/{}".format(token)
         recipient = [email]
         sender = os.getenv('EMAIL_HOST_USER')
         subject = 'Author\'s Haven Password Reset'
         body = "You requested to change your account password.\n\
-Click on the link below to complete changing your password.\n\n{}\n\
+Click on the link below to complete changing your password.\n\n{}\n\n\
 Ignore and Delete this email if you did not make this request.\n\n\t\
 Author\'s Haven by The Realers.".format(reset_link)
         
