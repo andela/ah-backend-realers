@@ -20,9 +20,17 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from authors.apps.article_tagging.views import ArticleTaggingViewSet
 
+from authors.apps.profiles.models import Profile
+from authors.apps.authentication.models import User
+from authors.apps.profiles.serializers import ProfileSerializer
+from authors.apps.authentication.serializers import UserSerializer
+from django.core.mail import send_mail
+import os
 class ArticleView(ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+    profile_serializer_class = ProfileSerializer
+    user_serializer_class = UserSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = ArticleSetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, )
@@ -31,17 +39,30 @@ class ArticleView(ListCreateAPIView):
     filterset_feilds = ('title', 'author__username', 'tagName')
 
     def post(self, request):
+        # print(request.user.username)
         article = request.data.get("article", {})
         check_tag_is_provided(article)
+        followers = Profile.objects.get(user__username=request.user.username).followed_by.all()
+        followers = self.profile_serializer_class(followers, many=True, context={
+            'request': request
+        })
+        followers = [user.get('username') for user in followers.data]
+        user_info = [User.objects.get(username=follower) for follower in followers]
+        # for follower in followers:
+        #     user_info.append(User.objects.get(username=follower))
+        user_info = self.user_serializer_class(user_info, many=True)
+        emails = [email.get('email') for email in user_info.data]
+        sender = os.getenv('EMAIL_HOST_USER')
+        subject = 'Author\'s Haven Notification'
+        body = f"{request.user.username.title()} has published a new article titled {article.get('title')}"
         serializer = self.serializer_class(data=article)
         serializer.is_valid(raise_exception=True)
         serializer.save(
             author=User.objects.filter(username=request.user.username).first()
         )
-        response = {
-            "success": "Article successfully created!", 
-            "data": serializer.data
-            }
+        response = {"success": "Article successfully created!",
+                    "data": serializer.data}
+        send_mail(subject, body, sender, emails, fail_silently=True)
         return Response(response, status=status.HTTP_201_CREATED)
 
 
