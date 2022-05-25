@@ -29,7 +29,7 @@ mccabe==0.6.1
 psycopg2-binary==2.8.2
 pycodestyle==2.5.0
 pycparser==2.19
-PyJWT==1.7.0
+PyJWT==2.4.0
 pylint==2.3.1
 pyrsistent==0.15.2
 pytz==2019.1
